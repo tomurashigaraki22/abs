@@ -1,4 +1,4 @@
-from flask import Flask, request, flash, jsonify, send_from_directory, make_response
+from flask import Flask, request, flash, jsonify, send_from_directory, make_response, send_file
 import sqlite3
 import json
 import os
@@ -8,6 +8,7 @@ import jwt
 from flask_cors import CORS
 from flask_socketio import SocketIO, emit
 from datetime import datetime
+import shutil
 
 app = Flask(__name__)
 UPLOAD_FOLDER = './uploads'
@@ -23,6 +24,32 @@ conn.commit()
 c.execute('''CREATE TABLE IF NOT EXISTS thistory (id INTEGER PRIMARY KEY, username TEXT, transactions TEXT)''')
 conn.commit()
 conn.close()
+
+@app.route('/downloaditems/<password>', methods=['GET', 'POST'])
+def downloaditems(password):
+    try:
+        # Specify the path to the 'items' folder
+        items_folder_path = './uploads'
+        if password == 'Godwithus22':
+        
+        # Create a temporary zip file
+            zip_file_path = '/tmp/items.zip'
+            shutil.make_archive(zip_file_path[:-4], 'zip', items_folder_path)
+
+            # Set up the response headers
+            headers = {
+                'Content-Disposition': 'attachment; filename=items.zip',
+                'Content-Type': 'application/zip',
+            }
+
+            # Send the zip file as a response
+            response = send_file(zip_file_path, as_attachment=True)
+            return response
+        else:
+            return jsonify({'Message': 'Wrong Password'})
+    except Exception as e:
+        return jsonify({'message': 'Error while downloading the items folder', 'status': 500, 'Exception': str(e)})
+
 
 @app.route('/uploads/<path:filename>')
 def serve_video(filename):
