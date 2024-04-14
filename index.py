@@ -125,7 +125,7 @@ def signup():
                 print(password)
                 conn = sqlite3.connect('./ec.db')
                 c = conn.cursor()
-                c.execute('INSERT INTO authentication (username, password, rank, balance) VALUES (?, ?, ?)', (username, password, rank, 0))
+                c.execute('INSERT INTO authentication (username, password, rank, balance) VALUES (?, ?, ?, ?)', (username, password, rank, 0))
                 conn.commit()
                 conn.close()
                 balance = '0'
