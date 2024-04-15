@@ -149,7 +149,7 @@ def login():
             username = request.form.get('username')
             password = request.form.get('password')
 
-            if len(username) > 3:
+            if username is not None:
                 conn = sqlite3.connect('./ec.db')
                 c = conn.cursor()
                 c.execute('SELECT * FROM authentication WHERE username = ? AND password = ?', (username, password))
