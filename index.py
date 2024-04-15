@@ -35,10 +35,15 @@ def changerank():
 
         conn = sqlite3.connect('./ec.db')
         c = conn.cursor()
-        c.execute('UPDATE authentication SET rank = ? WHERE username = ?', (rankchange, userid))
-        conn.commit()
-        conn.close()
-        return jsonify({"message": "Rank changed successfully", "status": 200})
+        c.execute('SELECT * FROM authentication WHERE username = ?', (userid,))
+        cs = c.fetchone()
+        if cs is not None:
+            c.execute('UPDATE authentication SET rank = ? WHERE username = ?', (rankchange, userid))
+            conn.commit()
+            conn.close()
+            return jsonify({"message": "Rank changed successfully", "status": 200})
+        else:
+            return jsonify({"message": "No user with such username", "status": 404})
 
     except sqlite3.Error as e:
         return jsonify({"message": "Database error: " + str(e), "status": 500})
@@ -56,10 +61,15 @@ def changebalance():
 
         conn = sqlite3.connect('./ec.db')
         c = conn.cursor()
-        c.execute('UPDATE users SET balance = ? WHERE username = ?', (balance, userid))
-        conn.commit()
-        conn.close()
-        return jsonify({"message": "Balance changed successfully", "status": 200})
+        c.execute('SELECT * FROM authentication WHERE username = ?', (userid,))
+        cs = c.fetchone()
+        if cs is not None:
+            c.execute('UPDATE authentication SET balance = ? WHERE username = ?', (balance, userid))
+            conn.commit()
+            conn.close()
+            return jsonify({"message": "Balance changed successfully", "status": 200})
+        else:
+            return jsonify({"message": "No such user found", "status": 404})
 
     except sqlite3.Error as e:
         return jsonify({"message": "Database error: " + str(e), "status": 500})
