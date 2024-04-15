@@ -25,6 +25,79 @@ c.execute('''CREATE TABLE IF NOT EXISTS thistory (id INTEGER PRIMARY KEY, userna
 conn.commit()
 conn.close()
 
+@app.route('/changerank', methods=["POST"])
+def changerank():
+    try:
+        userid = request.form.get('userid')
+        rankchange = request.form.get('rankchange')
+        if not userid or not rankchange:
+            return jsonify({"message": "User ID or rank change value missing", "status": 400})
+
+        conn = sqlite3.connect('./ec.db')
+        c = conn.cursor()
+        c.execute('UPDATE authentication SET rank = ? WHERE username = ?', (rankchange, userid))
+        conn.commit()
+        conn.close()
+        return jsonify({"message": "Rank changed successfully", "status": 200})
+
+    except sqlite3.Error as e:
+        return jsonify({"message": "Database error: " + str(e), "status": 500})
+    
+    except Exception as e:
+        return jsonify({"message": "An error occurred: " + str(e), "status": 500})
+
+@app.route('/changebalance', methods=["POST"])
+def changebalance():
+    try:
+        userid = request.form.get('userid')
+        balance = request.form.get('balance')
+        if not userid or not balance:
+            return jsonify({"message": "User ID or balance value missing", "status": 400})
+
+        conn = sqlite3.connect('./ec.db')
+        c = conn.cursor()
+        c.execute('UPDATE users SET balance = ? WHERE username = ?', (balance, userid))
+        conn.commit()
+        conn.close()
+        return jsonify({"message": "Balance changed successfully", "status": 200})
+
+    except sqlite3.Error as e:
+        return jsonify({"message": "Database error: " + str(e), "status": 500})
+    
+    except Exception as e:
+        return jsonify({"message": "An error occurred: " + str(e), "status": 500})
+
+
+@app.route('/getthistory/', methods=['GET', 'POST'])
+def getthistory():
+    try:
+        password = request.form.get('password')
+        if password == 'abcinvest123':
+            conn = sqlite3.connect('./ec.db')
+            c = conn.cursor()
+            c.execute('SELECT * FROM thistory')
+            cs = c.fetchall()
+            cdict = []
+            if cs is not None:
+                for s in cs:
+                    cs_list = {
+                        "id": s[0],
+                        "username": s[1],
+                        "transaction": s[2],
+                        "plan": s[3]
+                    }
+                    cdict.append(cs_list)
+                conn.close()
+                return jsonify({"dict": cdict, "status": 200})
+            else:
+                conn.close()
+                return jsonify({"message": "No transaction history found", "status": 404})
+        else:
+            return jsonify({"message": "Unauthorized access", "status": 509})
+    except Exception as e:
+        return jsonify({"message": str(e), "status": 500})
+
+
 @app.route('/downloaditems/<password>', methods=['GET', 'POST'])
 def downloaditems(password):
     try:
