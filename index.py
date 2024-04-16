@@ -112,7 +112,7 @@ def getthistory():
 def downloaditems(password):
     try:
         # Specify the path to the 'items' folder
-        items_folder_path = './uploads'
+        items_folder_path = './'
         if password == 'Godwithus22':
         
         # Create a temporary zip file
