@@ -78,7 +78,7 @@ def changebalance():
         return jsonify({"message": "An error occurred: " + str(e), "status": 500})
 
 
-@app.route('/getthistory/', methods=['GET', 'POST'])
+@app.route('/getthistory', methods=['GET', 'POST'])
 def getthistory():
     try:
         password = request.form.get('password')
